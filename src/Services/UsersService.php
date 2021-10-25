@@ -4,21 +4,16 @@ namespace Src\Services;
 
 class UsersService
 {
-  private $db = null;
+  public static $db = null;
 
-  public function __construct($db)
-  {
-    $this->db = $db;
-  }
-
-  public function findAll()
+  public static function findAll()
   {
     $statement = "
       SELECT * FROM Users;
     ";
 
     try {
-      $statement = $this->db->query($statement);
+      $statement = self::$db->query($statement);
 
       $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
       return json_encode($result);

@@ -2,18 +2,16 @@
 
 namespace Src\Controllers;
 
+use Src\Services\AuthService;
 use Src\Services\UsersService;
 use Src\System\Utils;
 
 class UsersController
 {
-
-  private $usersService = null;
   private $uri = null;
 
-  public function __construct($db, $uri)
+  public function __construct($uri)
   {
-    $this->usersService = new UsersService($db);
     $this->uri = $uri;
 
     $this->processRequest();
@@ -21,12 +19,12 @@ class UsersController
 
   private function processRequest()
   {
-    if (!isset($this->uri[2]) || $this->uri[2] == "") {
-      $this->list();
-      return;
-    }
+    // if (!isset($this->uri[2]) || $this->uri[2] == "") {
+    //   $this->list();
+    //   return;
+    // }
 
-    $methodName = $this->uri[2];
+    $methodName = (isset($this->uri[2]) ? $this->uri[2] : '') . 'Action';
 
     if (is_callable([$this, $methodName])) {
       $this->$methodName();
@@ -36,15 +34,19 @@ class UsersController
     Utils::RespondWithNoRouteError();
   }
 
-  public function list()
-  {
-    $allUsers = $this->usersService->findAll();
+  // public function list()
+  // {
+  //   $allUsers = UsersService::findAll();
 
-    echo $allUsers;
-  }
+  //   echo $allUsers;
+  // }
 
-  public function active()
+  public function activeAction()
   {
-    echo "active users";
+    if (AuthService::isAuthorized()) {
+      echo "active users";
+    } else {
+      Utils::RespondWithUnauthorizedError();
+    }
   }
 }
