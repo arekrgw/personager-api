@@ -2,9 +2,9 @@
 
 namespace Src\Controllers;
 
-use Src\Services\AuthService;
 use Src\Services\UsersService;
 use Src\System\Utils;
+use Src\System\Guards;
 
 class UsersController
 {
@@ -15,6 +15,10 @@ class UsersController
     $this->uri = $uri;
 
     $this->processRequest();
+
+    $this->activeAction = function () {
+      echo 'hello';
+    };
   }
 
   private function processRequest()
@@ -43,10 +47,7 @@ class UsersController
 
   public function activeAction()
   {
-    if (AuthService::isAuthorized()) {
-      echo "active users";
-    } else {
-      Utils::RespondWithUnauthorizedError();
-    }
+    if (!Guards::LoggedInGuard()) return;
+    echo "active users";
   }
 }
