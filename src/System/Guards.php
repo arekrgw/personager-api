@@ -10,7 +10,7 @@ class Guards
   {
     if (AuthService::isAuthorized()) return true;
 
-    Utils::RespondWithUnauthorizedError();
+    DefaultResponses::RespondWithUnauthorizedError();
     return false;
   }
 }

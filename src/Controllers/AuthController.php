@@ -2,7 +2,7 @@
 
 namespace Src\Controllers;
 
-use Src\System\Utils;
+use Src\System\DefaultResponses;
 use Src\Services\AuthService;
 
 
@@ -26,13 +26,38 @@ class AuthController
       return;
     }
 
-    Utils::RespondWithNoRouteError();
+    DefaultResponses::RespondWithNoRouteError();
   }
 
   private function loginAction()
   {
-    if ($_SERVER['REQUEST_METHOD'] != "POST") return Utils::RespondWithNoRouteError();
+    if ($_SERVER['REQUEST_METHOD'] != "POST") return DefaultResponses::RespondWithNoRouteError();
 
-    echo AuthService::loginUser();
+    $response = AuthService::loginUser();
+
+    if (isset($response["error"])) {
+      http_response_code(400);
+      echo json_encode(array("success" => false, "error" => $response["error"]));
+      return;
+    }
+    http_response_code(200);
+
+    echo json_encode(array("success" => true));
+  }
+
+  private function registerAction()
+  {
+    if ($_SERVER['REQUEST_METHOD'] != "POST") return DefaultResponses::RespondWithNoRouteError();
+
+    $response = AuthService::registerUser();
+
+    if (isset($response["error"])) {
+      http_response_code(400);
+      echo json_encode(array("success" => false, "error" => $response["error"]));
+      return;
+    }
+    http_response_code(201);
+
+    echo json_encode($response);
   }
 }

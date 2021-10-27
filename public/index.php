@@ -1,6 +1,7 @@
 <?php
 require "../bootstrap.php";
 
+use Src\System\DefaultResponses;
 use Src\System\Utils;
 
 header("Access-Control-Allow-Origin: *");
@@ -26,4 +27,4 @@ if (isset($controllers[$uri[1]])) {
   return;
 }
 
-Utils::RespondWithNoRouteError();
+DefaultResponses::RespondWithNoRouteError();

@@ -3,8 +3,9 @@
 namespace Src\Controllers;
 
 use Src\Services\UsersService;
-use Src\System\Utils;
+use Src\System\DefaultResponses;
 use Src\System\Guards;
+use Src\System\Scope;
 
 class UsersController
 {
@@ -35,7 +36,7 @@ class UsersController
       return;
     }
 
-    Utils::RespondWithNoRouteError();
+    DefaultResponses::RespondWithNoRouteError();
   }
 
   // public function list()
@@ -48,6 +49,6 @@ class UsersController
   public function activeAction()
   {
     if (!Guards::LoggedInGuard()) return;
-    echo "active users";
+    echo "active users" . Scope::$userId;
   }
 }

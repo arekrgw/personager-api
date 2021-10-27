@@ -7,27 +7,23 @@ use Src\Services\AuthService;
 
 class Utils
 {
-  public static function RespondWithNoRouteError()
-  {
-    http_response_code(404);
-    echo json_encode(array(
-      "status" => 404,
-      "error" => "this route does not exist"
-    ));
-  }
-
-  public static function RespondWithUnauthorizedError()
-  {
-    http_response_code(401);
-    echo json_encode(array(
-      "status" => 401,
-      "error" => "unauthorized"
-    ));
-  }
-
   public static function InjectDbIntoServices($db)
   {
     UsersService::$db = $db;
     AuthService::$db = $db;
+    Scope::$db = $db;
+  }
+
+  public static function EscapeString($string)
+  {
+    $str = mb_convert_encoding($string, 'UTF-8', 'UTF-8');
+    $str = htmlentities($string, ENT_QUOTES, 'UTF-8');
+
+    return $str;
+  }
+
+  public static function IsEmailValid($string)
+  {
+    return !!preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix", $string);
   }
 }
