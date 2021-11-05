@@ -4,11 +4,17 @@ require "../bootstrap.php";
 use Src\System\DefaultResponses;
 use Src\System\Utils;
 
-header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Origin, Content-Type, Authorization');
+header('Access-Control-Expose-Headers: Authorization');
+
+
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+  exit(0);
+}
 
 $_POST = json_decode(file_get_contents('php://input'), true);
 

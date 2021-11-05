@@ -32,7 +32,6 @@ class AuthController
   private function loginAction()
   {
     if ($_SERVER['REQUEST_METHOD'] != "POST") return DefaultResponses::RespondWithNoRouteError();
-
     $response = AuthService::loginUser();
 
     if (isset($response["error"])) {
