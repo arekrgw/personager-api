@@ -26,6 +26,7 @@ Utils::InjectDbIntoServices($dbConnection);
 $controllers = array(
   "users" => 'Src\Controllers\UsersController',
   "auth" => 'Src\Controllers\AuthController',
+  "events" => 'Src\Controllers\EventsController',
 );
 
 if (isset($controllers[$uri[1]])) {

@@ -4,6 +4,7 @@ namespace Src\System;
 
 use Src\Services\UsersService;
 use Src\Services\AuthService;
+use Src\Services\EventsService;
 
 class Utils
 {
@@ -11,6 +12,7 @@ class Utils
   {
     UsersService::$db = $db;
     AuthService::$db = $db;
+    EventsService::$db = $db;
     Scope::$db = $db;
   }
 
