@@ -5,6 +5,7 @@ namespace Src\Controllers;
 use Src\Services\EventsService;
 use Src\System\DefaultResponses;
 use Src\System\Guards;
+use Src\System\Utils;
 
 class EventsController
 {
@@ -38,8 +39,77 @@ class EventsController
 
   public function list()
   {
-    $allUsers = EventsService::findAll();
+    $response = EventsService::findAll();
 
-    echo $allUsers;
+    if (isset($response["error"])) {
+      http_response_code(400);
+      echo json_encode(array("success" => false, "error" => $response["error"]));
+      return;
+    }
+
+    http_response_code(200);
+
+    echo json_encode($response);
+  }
+
+  public function updateAction()
+  {
+    if ($_SERVER['REQUEST_METHOD'] != "PUT" || !isset($this->uri[3])) return DefaultResponses::RespondWithNoRouteError();
+
+    $_POST = Utils::EscapeWholeArray($_POST);
+
+    $response = EventsService::updateEvent($this->uri[3]);
+
+    if (isset($response["error"])) {
+      http_response_code(400);
+      echo json_encode(array("success" => false, "error" => $response["error"]));
+      return;
+    }
+
+    if (!$response) {
+      http_response_code(404);
+      return;
+    }
+
+    http_response_code(201);
+    echo json_encode($response);
+  }
+
+  public function createAction()
+  {
+    if ($_SERVER['REQUEST_METHOD'] != "POST") return DefaultResponses::RespondWithNoRouteError();
+
+    $_POST = Utils::EscapeWholeArray($_POST);
+
+    $response = EventsService::createEvent();
+
+    if (isset($response["error"])) {
+      http_response_code(400);
+      echo json_encode(array("success" => false, "error" => $response["error"]));
+      return;
+    }
+    http_response_code(200);
+
+    echo json_encode($response);
+  }
+
+  public function deleteAction()
+  {
+    if ($_SERVER['REQUEST_METHOD'] != "DELETE" || !isset($this->uri[3])) return DefaultResponses::RespondWithNoRouteError();
+
+    $response = EventsService::deleteEvent($this->uri[3]);
+
+    if (isset($response["error"])) {
+      http_response_code(400);
+      echo json_encode(array("success" => false, "error" => $response["error"]));
+      return;
+    }
+
+    if (!$response) {
+      http_response_code(404);
+      return;
+    }
+
+    http_response_code(204);
   }
 }

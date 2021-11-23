@@ -55,7 +55,7 @@ class AuthController
       echo json_encode(array("success" => false, "error" => $response["error"]));
       return;
     }
-    http_response_code(201);
+    http_response_code(200);
 
     echo json_encode($response);
   }

@@ -16,6 +16,17 @@ class Utils
     Scope::$db = $db;
   }
 
+  public static function EscapeWholeArray($arr)
+  {
+    $newArr = array();
+
+    foreach ($arr as $key => $value) {
+      $newArr[$key] = self::EscapeString($value);
+    }
+
+    return $newArr;
+  }
+
   public static function EscapeString($string)
   {
     $str = mb_convert_encoding($string, 'UTF-8', 'UTF-8');
