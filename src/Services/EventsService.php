@@ -51,8 +51,8 @@ class EventsService
 
       $stmt->execute(array("ownerId" => Scope::$userId, "id" => $id));
 
-      $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-      return isset($result[0]) ? $result[0] : null;
+      $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+      return $result;
     } catch (\PDOException $e) {
       return array("error" => "something unexpected happened");
     }
@@ -107,8 +107,29 @@ class EventsService
         return $validation;
       }
 
-      return array("id" => "success");
+      $stmt = "
+        INSERT INTO Events VALUES (NULL, :startDate, :endDate, :name, :description, :ownerId);
+      ";
+
+      $stmt = self::$db->prepare($stmt);
+
+      $properties = array(
+        "name" => $_POST["name"],
+        "description" => isset($_POST["description"]) ? $_POST["description"] : "",
+        "startDate" => $_POST["startDate"],
+        "endDate" => $_POST["endDate"],
+        "ownerId" => Scope::$userId,
+      );
+
+      $stmt->execute($properties);
+
+      $updatedEvent = self::find(self::$db->lastInsertId());
+
+      if (!$updatedEvent) return false;
+
+      return $updatedEvent;
     } catch (Exception $e) {
+      var_dump($e);
       return array("error" => "something unexpected happened");
     }
   }
@@ -116,9 +137,24 @@ class EventsService
   public static function deleteEvent($eventId)
   {
     try {
-      return array("id" => $eventId);
+      $stmt = "
+        DELETE FROM Events WHERE id = :id AND ownerId = :ownerId;
+      ";
+
+      $properties = array(
+        "id" => $eventId,
+        "ownerId" => Scope::$userId,
+      );
+
+      $stmt = self::$db->prepare($stmt);
+
+      $stmt->execute($properties);
+
+      return !!$stmt->rowCount();
     } catch (Exception $e) {
       return array("error" => "something unexpected happened");
     }
   }
+
+
 }

@@ -22,4 +22,17 @@ class DefaultResponses
       "error" => "unauthorized"
     ));
   }
+  public static function RespondWithBadRequestError($error)
+  {
+    if (isset($error["error"])) {
+      http_response_code(401);
+      echo json_encode(array(
+        "status" => 401,
+        "error" => $error["error"],
+      ));
+      return true;
+    }
+
+    return false;
+  }
 }

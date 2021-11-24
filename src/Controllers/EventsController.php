@@ -41,9 +41,23 @@ class EventsController
   {
     $response = EventsService::findAll();
 
-    if (isset($response["error"])) {
-      http_response_code(400);
-      echo json_encode(array("success" => false, "error" => $response["error"]));
+    if (DefaultResponses::RespondWithBadRequestError($response)) return;
+
+    http_response_code(200);
+
+    echo json_encode($response);
+  }
+
+  public function oneAction()
+  {
+    if ($_SERVER['REQUEST_METHOD'] != "GET" || !isset($this->uri[3])) return DefaultResponses::RespondWithNoRouteError();
+
+    $response = EventsService::find($this->uri[3]);
+
+    if (DefaultResponses::RespondWithBadRequestError($response)) return;
+
+    if (!$response) {
+      http_response_code(404);
       return;
     }
 
@@ -60,11 +74,7 @@ class EventsController
 
     $response = EventsService::updateEvent($this->uri[3]);
 
-    if (isset($response["error"])) {
-      http_response_code(400);
-      echo json_encode(array("success" => false, "error" => $response["error"]));
-      return;
-    }
+    if (DefaultResponses::RespondWithBadRequestError($response)) return;
 
     if (!$response) {
       http_response_code(404);
@@ -83,11 +93,13 @@ class EventsController
 
     $response = EventsService::createEvent();
 
-    if (isset($response["error"])) {
-      http_response_code(400);
-      echo json_encode(array("success" => false, "error" => $response["error"]));
+    if (DefaultResponses::RespondWithBadRequestError($response)) return;
+
+    if (!$response) {
+      DefaultResponses::RespondWithBadRequestError(array("error" => "something unexpected happened"));
       return;
     }
+
     http_response_code(200);
 
     echo json_encode($response);
@@ -99,11 +111,7 @@ class EventsController
 
     $response = EventsService::deleteEvent($this->uri[3]);
 
-    if (isset($response["error"])) {
-      http_response_code(400);
-      echo json_encode(array("success" => false, "error" => $response["error"]));
-      return;
-    }
+    if (DefaultResponses::RespondWithBadRequestError($response)) return;
 
     if (!$response) {
       http_response_code(404);
