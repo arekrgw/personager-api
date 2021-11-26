@@ -29,8 +29,7 @@ class Utils
 
   public static function EscapeString($string)
   {
-    $str = mb_convert_encoding($string, 'UTF-8', 'UTF-8');
-    $str = htmlentities($string, ENT_QUOTES, 'UTF-8');
+    $str = htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 
     return $str;
   }
