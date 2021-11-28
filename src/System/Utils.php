@@ -5,6 +5,7 @@ namespace Src\System;
 use Src\Services\UsersService;
 use Src\Services\AuthService;
 use Src\Services\EventsService;
+use Src\Services\TodosService;
 
 class Utils
 {
@@ -13,15 +14,36 @@ class Utils
     UsersService::$db = $db;
     AuthService::$db = $db;
     EventsService::$db = $db;
+    TodosService::$db = $db;
     Scope::$db = $db;
+  }
+
+  private static function isAssoc(array $arr)
+  {
+    if (array() === $arr) return false;
+    return array_keys($arr) !== range(0, count($arr) - 1);
   }
 
   public static function EscapeWholeArray($arr)
   {
     $newArr = array();
 
+    if (is_array($arr) && !self::isAssoc($arr)) {
+      foreach ($arr as $element) {
+        array_push($newArr, self::EscapeWholeArray($element));
+      }
+
+      return $newArr;
+    }
+
     foreach ($arr as $key => $value) {
-      $newArr[$key] = self::EscapeString($value);
+      if (is_array($value)) {
+        $newArr[$key] = self::EscapeWholeArray($value);
+      } else if (is_bool($value) || is_numeric($value)) {
+        $newArr[$key] = $value;
+      } else {
+        $newArr[$key] = self::EscapeString($value);
+      }
     }
 
     return $newArr;

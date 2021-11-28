@@ -25,9 +25,9 @@ class DefaultResponses
   public static function RespondWithBadRequestError($error)
   {
     if (isset($error["error"])) {
-      http_response_code(401);
+      http_response_code(400);
       echo json_encode(array(
-        "status" => 401,
+        "status" => 400,
         "error" => $error["error"],
       ));
       return true;

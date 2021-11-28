@@ -27,6 +27,7 @@ $controllers = array(
   "users" => 'Src\Controllers\UsersController',
   "auth" => 'Src\Controllers\AuthController',
   "events" => 'Src\Controllers\EventsController',
+  "todos" => 'Src\Controllers\TodosController',
 );
 
 if (isset($controllers[$uri[1]])) {

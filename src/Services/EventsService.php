@@ -25,7 +25,7 @@ class EventsService
   public static function findAll()
   {
     $stmt = "
-      SELECT * FROM Events WHERE ownerId = :ownerId;
+      SELECT * FROM Events WHERE ownerId = :ownerId ORDER BY startDate DESC;
     ";
 
     try {
@@ -129,7 +129,6 @@ class EventsService
 
       return $updatedEvent;
     } catch (Exception $e) {
-      var_dump($e);
       return array("error" => "something unexpected happened");
     }
   }
@@ -155,6 +154,4 @@ class EventsService
       return array("error" => "something unexpected happened");
     }
   }
-
-
 }
