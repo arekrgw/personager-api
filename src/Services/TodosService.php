@@ -104,7 +104,7 @@ class TodosService
 
       $properties = array(
         "name" => $_POST["name"],
-        "completed" => $_POST["completed"],
+        "completed" => (int)$_POST["completed"],
         "todos" => json_encode($_POST["todos"]),
         "id" => $todoId,
         "ownerId" => Scope::$userId,
@@ -143,7 +143,7 @@ class TodosService
 
       $properties = array(
         "name" => $_POST["name"],
-        "completed" => $_POST["completed"],
+        "completed" => (int)$_POST["completed"],
         "todos" => json_encode($_POST["todos"]),
         "ownerId" => Scope::$userId,
       );
