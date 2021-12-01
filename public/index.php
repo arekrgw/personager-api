@@ -28,6 +28,7 @@ $controllers = array(
   "auth" => 'Src\Controllers\AuthController',
   "events" => 'Src\Controllers\EventsController',
   "todos" => 'Src\Controllers\TodosController',
+  "reminders" => 'Src\Controllers\RemindersController',
 );
 
 if (isset($controllers[$uri[1]])) {

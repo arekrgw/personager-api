@@ -25,7 +25,7 @@ class TodosService
     }
 
     foreach ($todoList["todos"] as $key => $value) {
-      if (!isset($value["description"]) || strlen($value["description"]) < 3) {
+      if (!isset($value["description"]) || strlen($value["description"]) < 1) {
         return array("error" => "todo[$key] description is too short");
       }
 
