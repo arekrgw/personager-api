@@ -132,6 +132,29 @@ class EventsService
       return array("error" => "something unexpected happened");
     }
   }
+  public static function getDashboard() {
+    $stmt = "
+      SELECT * FROM Events WHERE ownerId=:ownerId AND
+      (
+        (startDate <= NOW() && endDate >= NOW()) OR
+        (startDate >= CURDATE() && startDate < (CURDATE() + INTERVAL 1 DAY)) OR
+        (endDate >= CURDATE() && endDate < (CURDATE() + INTERVAL 1 DAY))
+      );
+    ";
+
+    try {
+      $stmt = self::$db->prepare($stmt);
+
+      $stmt->execute(array("ownerId" => Scope::$userId));
+
+      $res = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+      return $res;
+    } catch (\PDOException $e) {
+      return array("error" => "something unexpected happened");
+    }
+  }
+
 
   public static function deleteEvent($eventId)
   {

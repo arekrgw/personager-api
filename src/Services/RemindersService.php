@@ -15,7 +15,7 @@ class RemindersService
     if (!isset($event["title"]) || strlen($event["title"]) < 3) {
       return array("error" => "name is too short");
     }
-    if (!isset($event["targetDate"]) || strtotime($event["targetDate"]) - time() < 0) {
+    if (!isset($event["targetDate"])) {
       return array("error" => "invalid date");
     }
 
@@ -45,7 +45,6 @@ class RemindersService
 
       return $result;
     } catch (\PDOException $e) {
-      print_r($e);
       return array("error" => "something unexpected happened");
     }
   }
@@ -77,6 +76,33 @@ class RemindersService
     }
   }
 
+  public static function getDashboard()
+  {
+    $stmt = "
+      SELECT *
+      FROM Reminders
+      WHERE Reminders.id IN (
+        SELECT Reminders.id
+        FROM RemindersResolvers
+        INNER JOIN Reminders
+        ON Reminders.id = RemindersResolvers.reminderId
+        WHERE Reminders.ownerId=:ownerId AND RemindersResolvers.whence >= CURDATE() AND RemindersResolvers.whence < (CURDATE() + INTERVAL 1 DAY)
+      )";
+
+    try {
+      $stmt = self::$db->prepare($stmt);
+
+      $stmt->execute(array("ownerId" => Scope::$userId));
+
+      $res = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+      return $res;
+    } catch (\PDOException $e) {
+      return array("error" => "something unexpected happened");
+    }
+  }
+
+
   public static function findByResolver($id)
   {
     $stmt = "
@@ -99,7 +125,7 @@ class RemindersService
   public static function updateReminder($reminderId)
   {
     try {
-      $validation = self::validateBody($_POST);
+      $validation = self::validateBody($_POST); // TODO: Check if resolvers are valid after date change
 
       if (isset($validation["error"])) {
         return $validation;

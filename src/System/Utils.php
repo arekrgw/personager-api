@@ -4,6 +4,7 @@ namespace Src\System;
 
 use Src\Services\UsersService;
 use Src\Services\AuthService;
+use Src\Services\DashboardService;
 use Src\Services\EventsService;
 use Src\Services\RemindersResolversService;
 use Src\Services\RemindersService;
@@ -19,6 +20,7 @@ class Utils
     TodosService::$db = $db;
     RemindersService::$db = $db;
     RemindersResolversService::$db = $db;
+    DashboardService::$db = $db;
     Scope::$db = $db;
   }
 

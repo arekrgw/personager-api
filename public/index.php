@@ -30,6 +30,7 @@ $controllers = array(
   "todos" => 'Src\Controllers\TodosController',
   "reminders" => 'Src\Controllers\RemindersController',
   "resolvers" => 'Src\Controllers\RemindersResolversController',
+  "dashboard" => 'Src\Controllers\DashboardController'
 );
 
 if (isset($controllers[$uri[1]])) {

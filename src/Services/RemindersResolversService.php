@@ -72,7 +72,6 @@ class RemindersResolversService
 
       return $updatedReminderResolver;
     } catch (Exception $e) {
-      print_r($e);
       return array("error" => "something unexpected happened");
     }
   }
@@ -130,7 +129,6 @@ class RemindersResolversService
 
       return !!$stmt->rowCount();
     } catch (Exception $e) {
-      print_r($e);
       return array("error" => "something unexpected happened");
     }
   }
