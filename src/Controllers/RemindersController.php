@@ -72,7 +72,7 @@ class RemindersController
 
     $_POST = Utils::EscapeWholeArray($_POST);
 
-    $response = RemindersService::updateEvent($this->uri[3]);
+    $response = RemindersService::updateReminder($this->uri[3]);
 
     if (DefaultResponses::RespondWithBadRequestError($response)) return;
 
@@ -91,7 +91,7 @@ class RemindersController
 
     $_POST = Utils::EscapeWholeArray($_POST);
 
-    $response = RemindersService::createEvent();
+    $response = RemindersService::createReminder();
 
     if (DefaultResponses::RespondWithBadRequestError($response)) return;
 
@@ -109,7 +109,7 @@ class RemindersController
   {
     if ($_SERVER['REQUEST_METHOD'] != "DELETE" || !isset($this->uri[3])) return DefaultResponses::RespondWithNoRouteError();
 
-    $response = RemindersService::deleteEvent($this->uri[3]);
+    $response = RemindersService::deleteReminder($this->uri[3]);
 
     if (DefaultResponses::RespondWithBadRequestError($response)) return;
 

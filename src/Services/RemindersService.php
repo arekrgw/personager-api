@@ -12,11 +12,11 @@ class RemindersService
   public static function validateBody($event)
   {
 
-    if (!isset($event["name"]) || strlen($event["name"]) < 3) {
+    if (!isset($event["title"]) || strlen($event["title"]) < 3) {
       return array("error" => "name is too short");
     }
-    if (!isset($event["startDate"]) || !isset($event["endDate"]) || strtotime($event["startDate"]) - strtotime($event["endDate"]) > 0) {
-      return array("error" => "invalid dates");
+    if (!isset($event["targetDate"]) || strtotime($event["targetDate"]) - time() < 0) {
+      return array("error" => "invalid date");
     }
 
     return true;
@@ -75,7 +75,7 @@ class RemindersService
     }
   }
 
-  public static function updateEvent($eventId)
+  public static function updateReminder($reminderId)
   {
     try {
       $validation = self::validateBody($_POST);
@@ -85,37 +85,37 @@ class RemindersService
       }
 
       $stmt = "
-        UPDATE Events SET name=:name, description=:description, startDate=:startDate, endDate=:endDate WHERE id=:id AND ownerId=:ownerId
+        UPDATE Reminders SET title=:title, description=:description, targetDate=:targetDate WHERE id=:id AND ownerId=:ownerId
       ";
 
       $stmt = self::$db->prepare($stmt);
 
       $properties = array(
-        "name" => $_POST["name"],
+        "title" => $_POST["title"],
         "description" => isset($_POST["description"]) ? $_POST["description"] : "",
-        "startDate" => $_POST["startDate"],
-        "endDate" => $_POST["endDate"],
-        "id" => $eventId,
+        "targetDate" => $_POST["targetDate"],
+        "ownerId" => Scope::$userId,
+        "id" => $reminderId,
         "ownerId" => Scope::$userId,
       );
 
       $stmt->execute($properties);
 
-      $updatedEvent = self::find($eventId);
+      $updatedReminder = self::find($reminderId);
 
-      if (isset($updatedEvent["error"])) {
+      if (isset($updatedReminder["error"])) {
         return array("error" => "something unexpected happened");;
       }
 
-      if (!$updatedEvent) return false;
+      if (!$updatedReminder) return false;
 
-      return $updatedEvent;
+      return $updatedReminder;
     } catch (Exception $e) {
       return array("error" => "something unexpected happened");
     }
   }
 
-  public static function createEvent()
+  public static function createReminder()
   {
     try {
       $validation = self::validateBody($_POST);
@@ -125,46 +125,53 @@ class RemindersService
       }
 
       $stmt = "
-        INSERT INTO Events VALUES (NULL, :startDate, :endDate, :name, :description, :ownerId);
+        INSERT INTO Reminders VALUES (NULL, :title, :description, :ownerId, :targetDate);
       ";
 
       $stmt = self::$db->prepare($stmt);
 
       $properties = array(
-        "name" => $_POST["name"],
+        "title" => $_POST["title"],
         "description" => isset($_POST["description"]) ? $_POST["description"] : "",
-        "startDate" => $_POST["startDate"],
-        "endDate" => $_POST["endDate"],
+        "targetDate" => $_POST["targetDate"],
         "ownerId" => Scope::$userId,
       );
 
       $stmt->execute($properties);
 
-      $updatedEvent = self::find(self::$db->lastInsertId());
+      $createdReminder = self::find(self::$db->lastInsertId());
 
-      if (!$updatedEvent) return false;
+      if (!$createdReminder) return false;
 
-      return $updatedEvent;
+      return $createdReminder;
     } catch (Exception $e) {
       return array("error" => "something unexpected happened");
     }
   }
 
-  public static function deleteEvent($eventId)
+  public static function deleteReminder($reminderId)
   {
     try {
       $stmt = "
-        DELETE FROM Events WHERE id = :id AND ownerId = :ownerId;
+        DELETE FROM Reminders WHERE id = :id AND ownerId = :ownerId;
+      ";
+
+      $stmtResolvers = "
+        DELETE FROM RemindersResolvers WHERE reminderId=:reminderId;
       ";
 
       $properties = array(
-        "id" => $eventId,
+        "id" => $reminderId,
         "ownerId" => Scope::$userId,
       );
 
       $stmt = self::$db->prepare($stmt);
 
       $stmt->execute($properties);
+
+      $stmtResolvers = self::$db->prepare($stmtResolvers);
+
+      $stmtResolvers->execute(array("reminderId" => $reminderId));
 
       return !!$stmt->rowCount();
     } catch (Exception $e) {
