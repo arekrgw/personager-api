@@ -50,7 +50,7 @@ class RemindersService
     }
   }
 
-  public static function find($id)
+  public static function find($id, $resolvers = true)
   {
     $stmt = "
       SELECT * FROM Reminders WHERE ownerId=:ownerId AND id=:id;
@@ -65,9 +65,30 @@ class RemindersService
 
       $result = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-      $prep = self::$db->prepare($subStmt);
-      $prep->execute(array("reminderId" => $result["id"]));
-      $result["resolvers"] = $prep->fetchAll(\PDO::FETCH_ASSOC);
+      if ($resolvers) {
+        $prep = self::$db->prepare($subStmt);
+        $prep->execute(array("reminderId" => $result["id"]));
+        $result["resolvers"] = $prep->fetchAll(\PDO::FETCH_ASSOC);
+      }
+
+      return $result;
+    } catch (\PDOException $e) {
+      return array("error" => "something unexpected happened");
+    }
+  }
+
+  public static function findByResolver($id)
+  {
+    $stmt = "
+      SELECT * FROM Reminders WHERE ownerId=:ownerId AND id=(SELECT RemindersResolvers.reminderId FROM RemindersResolvers INNER JOIN Reminders ON Reminders.id = RemindersResolvers.reminderId WHERE RemindersResolvers.id = :id);
+    ";
+
+    try {
+      $stmt = self::$db->prepare($stmt);
+
+      $stmt->execute(array("ownerId" => Scope::$userId, "id" => $id));
+
+      $result = $stmt->fetch(\PDO::FETCH_ASSOC);
 
       return $result;
     } catch (\PDOException $e) {
@@ -94,7 +115,6 @@ class RemindersService
         "title" => $_POST["title"],
         "description" => isset($_POST["description"]) ? $_POST["description"] : "",
         "targetDate" => $_POST["targetDate"],
-        "ownerId" => Scope::$userId,
         "id" => $reminderId,
         "ownerId" => Scope::$userId,
       );
